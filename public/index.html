@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LaughLoop</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <h1>LaughLoop 😂</h1>
+
+  <div id="authSection">
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="register()">Register</button>
+    <button onclick="login()">Login</button>
+  </div>
+
+  <div id="appSection" style="display:none;">
+    <h3 id="welcome"></h3>
+
+    <input type="file" id="imageInput">
+    <input id="caption" placeholder="Funny caption">
+    <button onclick="uploadPost()">Post</button>
+
+    <h2>Global Feed</h2>
+    <div id="feed"></div>
+
+    <h2>Live Chat</h2>
+    <div id="chatBox"></div>
+    <input id="chatMsg" placeholder="Type message">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>

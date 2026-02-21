@@ -1,0 +1,46 @@
+body {
+  background: #121212;
+  color: white;
+  font-family: Arial;
+  margin: 0;
+}
+
+.container {
+  max-width: 500px;
+  margin: auto;
+  padding: 20px;
+}
+
+input, button {
+  width: 100%;
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+}
+
+button {
+  background: #ff4081;
+  color: white;
+  cursor: pointer;
+}
+
+.post {
+  background: #1e1e1e;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+}
+
+.post img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+#chatBox {
+  height: 150px;
+  overflow-y: auto;
+  background: #1e1e1e;
+  padding: 10px;
+  margin-bottom: 10px;
+}
