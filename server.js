@@ -18,7 +18,7 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// 🔥 FIXED ROOT ROUTE
+// ROOT
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
@@ -31,20 +31,30 @@ app.get("/messages", async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch messages" });
+    console.error("DB ERROR:", err);
+    res.status(500).json({
+      message: "Database error",
+      error: err.message
+    });
   }
 });
 
 // POST message
-app.get("/messages", async (req, res) => {
+app.post("/messages", async (req, res) => {
+  const { username, type, url } = req.body;
+
   try {
     const result = await pool.query(
-      "SELECT * FROM messages ORDER BY created_at DESC"
+      "INSERT INTO messages (username, type, url) VALUES ($1, $2, $3) RETURNING *",
+      [username, type, url]
     );
-    res.json(result.rows);
+    res.json(result.rows[0]);
   } catch (err) {
     console.error("DB ERROR:", err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({
+      message: "Insert failed",
+      error: err.message
+    });
   }
 });
 
