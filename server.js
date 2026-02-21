@@ -1,9 +1,15 @@
 import express from "express";
 import pg from "pg";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 app.use(express.json());
-app.use(express.static("public"));
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(express.static(path.join(__dirname, "public")));
 
 const { Pool } = pg;
 
@@ -12,7 +18,12 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// GET all messages
+// 🔥 FIXED ROOT ROUTE
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// GET messages
 app.get("/messages", async (req, res) => {
   try {
     const result = await pool.query(
@@ -41,5 +52,6 @@ app.post("/messages", async (req, res) => {
 });
 
 export default app;
+
 
 
