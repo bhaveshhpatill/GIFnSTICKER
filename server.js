@@ -106,24 +106,17 @@ app.post("/messages", async (req, res) => {
     res.status(500).json({ error: "Failed to send message" });
   }
 });
-
-// Get Messages
 app.get("/messages", async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT * FROM messages ORDER BY created_at DESC"
     );
-
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch messages" });
   }
 });
 
-// ---------------- START SERVER ----------------
+export default app;
 
-const PORT = 5002;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
