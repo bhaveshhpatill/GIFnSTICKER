@@ -6,6 +6,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(express.static("public")); // ✅ must come AFTER app is created
 
 const { Pool } = pg;
 
@@ -24,12 +25,15 @@ pool.connect()
     console.error("Database Connection Error:", err);
   });
 
-// Test Route
+// ---------------- ROUTES ----------------
+
+// Home Route
 app.get("/", (req, res) => {
-  res.send("Server is running 🚀");
+  res.sendFile(path.join(process.cwd(), "public", "index.html"));
 });
 
-// Example Test Query Route
+
+// Test DB
 app.get("/test-db", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
@@ -38,17 +42,10 @@ app.get("/test-db", async (req, res) => {
       time: result.rows[0]
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Database query failed" });
   }
 });
 
-// Start Server
-const PORT = 5002;
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
 // Create User
 app.post("/users", async (req, res) => {
   const { name, email } = req.body;
@@ -61,21 +58,11 @@ app.post("/users", async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Failed to create user" });
   }
 });
-app.delete("/users/:id", async (req, res) => {
-  const { id } = req.params;
 
-  try {
-    await pool.query("DELETE FROM users WHERE id = $1", [id]);
-    res.json({ message: "User deleted successfully" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to delete user" });
-  }
-});
+// Update User
 app.put("/users/:id", async (req, res) => {
   const { id } = req.params;
   const { name, email } = req.body;
@@ -88,7 +75,55 @@ app.put("/users/:id", async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Failed to update user" });
   }
+});
+
+// Delete User
+app.delete("/users/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await pool.query("DELETE FROM users WHERE id = $1", [id]);
+    res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete user" });
+  }
+});
+
+// Send Message (GIF / Sticker)
+app.post("/messages", async (req, res) => {
+  const { username, type, url } = req.body;
+
+  try {
+    const result = await pool.query(
+      "INSERT INTO messages (username, type, url) VALUES ($1, $2, $3) RETURNING *",
+      [username, type, url]
+    );
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to send message" });
+  }
+});
+
+// Get Messages
+app.get("/messages", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM messages ORDER BY created_at DESC"
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch messages" });
+  }
+});
+
+// ---------------- START SERVER ----------------
+
+const PORT = 5002;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
