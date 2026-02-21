@@ -36,18 +36,15 @@ app.get("/messages", async (req, res) => {
 });
 
 // POST message
-app.post("/messages", async (req, res) => {
-  const { username, url } = req.body;
-
+app.get("/messages", async (req, res) => {
   try {
     const result = await pool.query(
-      "INSERT INTO messages (username, type, url) VALUES ($1, $2, $3) RETURNING *",
-      [username, "gif", url]
+      "SELECT * FROM messages ORDER BY created_at DESC"
     );
-
-    res.json(result.rows[0]);
+    res.json(result.rows);
   } catch (err) {
-    res.status(500).json({ error: "Failed to send message" });
+    console.error("DB ERROR:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 
